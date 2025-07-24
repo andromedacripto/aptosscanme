@@ -15,7 +15,15 @@ AptosScanMe is a simple dApp built for the Aptos Vietnam Hackathon. It allows an
 - React (Vite)
 - Tailwind CSS
 - Aptos SDK
-- GitHub Pages / Netlify (for deploy)
+- GitHub Pages / Vercel (for deploy)
+
+## 🧑‍💻 Developer
+
+- GitHub: [andromedacripto](https://github.com/andromedacripto)  
+- Email: andromedacripto17@gmail.com  
+- Aptos Wallet: 0x939b9b01124f09be2c8a5d92899d09375d4b87e492f4f6782a39f8f83a7a1f22
+
+
 
 ## 📦 Getting Started
 
@@ -32,10 +40,5 @@ npm install
 npm run dev
 ---
 
-## 🧑‍💻 Desenvolvedor
-
-- GitHub: [andromedacripto](https://github.com/andromedacripto)  
-- E-mail: andromedacripto@gmail.com  
-- Aptos Wallet: 0x939b9b01124f09be2c8a5d92899d09375d4b87e492f4f6782a39f8f83a7a1f22
 
 
