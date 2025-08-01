@@ -125,18 +125,24 @@ export default function WalletChecker() {
         {error && <p className="text-red-500 mt-4">{error}</p>}
 
         {balance && (
-          <div className="mt-6 text-center w-full max-w-md mx-auto">
-            <h2 className="text-xl font-bold mb-4">
-              Balances ({network === Network.MAINNET ? "Mainnet" : "Testnet"}):
-            </h2>
-            <ul className="flex justify-center gap-8 text-lg font-semibold">
-              <li>APT: {balance.APT.toFixed(2)} APT</li>
-              <li>USDC: {balance.USDC.toFixed(2)} USDC</li>
-              <li>USDT: {balance.USDT.toFixed(2)} USDT</li>
-              <li>Total NFTs: {nfts.length}</li>
-            </ul>
-          </div>
-        )}
+  <div className="mt-6 text-center w-full max-w-md mx-auto">
+    <h2 className="text-xl font-bold mb-4">
+      Balances ({network === Network.MAINNET ? "Mainnet" : "Testnet"}):
+    </h2>
+    <ul className="flex justify-center gap-8 text-lg font-semibold">
+      <li>APT: {(balance.APT ?? 0).toFixed(2)} APT</li>
+      <li>USDC: {(balance.USDC ?? 0).toFixed(2)} USDC</li>
+      <li>USDT: {(balance.USDT ?? 0).toFixed(2)} USDT</li>
+      <li>Total NFTs: {nfts.length}</li>
+    </ul>
+
+    {(balance.APT ?? 0) === 0 && (
+      <p className="mt-2 text-sm text-yellow-600 font-medium">
+        ⚠️ This wallet does not have any APT balance yet.
+      </p>
+    )}
+  </div>
+)}
 
         {transactions.length > 0 ? (
           <div className="mt-8 w-full max-w-4xl">
