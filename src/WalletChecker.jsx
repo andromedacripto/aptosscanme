@@ -11,6 +11,11 @@ export default function WalletChecker() {
   const [network, setNetwork] = useState(Network.MAINNET);
   const [client, setClient] = useState(new Aptos({ network }));
 
+  // Tipos dos tokens oficiais
+  const APT_TYPE = "0x1::aptos_coin::AptosCoin";
+  const USDC_TYPE = "0xf22bede237a07e121b56d91a491eb7bcdfd1f590::asset::USDC";
+  const USDT_TYPE = "0xf22bede237a07e121b56d91a491eb7bcdfd1f590::asset::USDT";
+
   useEffect(() => {
     setClient(new Aptos({ network }));
     setBalance(null);
@@ -20,6 +25,13 @@ export default function WalletChecker() {
   }, [network]);
 
   const isValidAptosAddress = (addr) => /^0x[a-fA-F0-9]{64}$/.test(addr);
+
+  const getBalanceByType = (resources, type) => {
+    const resource = resources.find((r) =>
+      r.type.includes(`0x1::coin::CoinStore<${type}>`)
+    );
+    return resource ? Number(resource.data.coin.value) : 0;
+  };
 
   const checkWallet = async () => {
     if (!isValidAptosAddress(address)) {
@@ -36,26 +48,22 @@ export default function WalletChecker() {
     try {
       const resources = await client.getAccountResources({ accountAddress: address });
 
-      const aptosCoin = resources.find((r) =>
-        r.type.includes("0x1::aptos_coin::AptosCoin")
-      );
-      const balanceAPT = aptosCoin?.data?.coin?.value;
-      const balanceUSDC = resources.find((r) =>
-        r.type.toLowerCase().includes("usdc")
-      )?.data?.coin?.value;
-      const balanceUSDT = resources.find((r) =>
-        r.type.toLowerCase().includes("usdt")
-      )?.data?.coin?.value;
+      // Buscar saldos de APT, USDC e USDT
+      const balanceAPT = getBalanceByType(resources, APT_TYPE) / 1e8;
+      const balanceUSDC = getBalanceByType(resources, USDC_TYPE) / 1e6;
+      const balanceUSDT = getBalanceByType(resources, USDT_TYPE) / 1e6;
 
       setBalance({
-        APT: balanceAPT ? Number(balanceAPT) / 1e8 : 0,
-        USDC: balanceUSDC ? Number(balanceUSDC) / 1e6 : 0,
-        USDT: balanceUSDT ? Number(balanceUSDT) / 1e6 : 0,
+        APT: balanceAPT,
+        USDC: balanceUSDC,
+        USDT: balanceUSDT,
       });
 
+      // Buscar NFTs
       const tokens = await client.getAccountOwnedTokens({ accountAddress: address });
       setNfts(tokens);
 
+      // Buscar transações das últimas 24h
       const txs = await client.getAccountTransactions({ accountAddress: address });
       if (txs && txs.length > 0) {
         const filtered = txs.filter((tx) => {
@@ -63,9 +71,7 @@ export default function WalletChecker() {
           const now = new Date();
           return now.getTime() - time.getTime() <= 24 * 60 * 60 * 1000;
         });
-        setTransactions(
-          filtered.sort((a, b) => b.timestamp - a.timestamp) // ordenar do mais recente para o mais antigo
-        );
+        setTransactions(filtered.sort((a, b) => b.timestamp - a.timestamp));
       }
     } catch (err) {
       console.error(err);
@@ -124,9 +130,9 @@ export default function WalletChecker() {
               Balances ({network === Network.MAINNET ? "Mainnet" : "Testnet"}):
             </h2>
             <ul className="flex justify-center gap-8 text-lg font-semibold">
-              <li>APT: {balance.APT}</li>
-              <li>USDC: {balance.USDC}</li>
-              <li>USDT: {balance.USDT}</li>
+              <li>APT: {balance.APT.toFixed(2)} APT</li>
+              <li>USDC: {balance.USDC.toFixed(2)} USDC</li>
+              <li>USDT: {balance.USDT.toFixed(2)} USDT</li>
               <li>Total NFTs: {nfts.length}</li>
             </ul>
           </div>
@@ -147,7 +153,6 @@ export default function WalletChecker() {
                 const toAddress = isTransfer ? tx.payload.arguments?.[0] : "Unknown";
                 const amount = isTransfer ? Number(tx.payload.arguments?.[1]) / 1e8 : "N/A";
 
-                // Formatar data e hora
                 const txDate = new Date(tx.timestamp / 1000);
                 const formattedDate = txDate.toLocaleDateString(undefined, {
                   year: "numeric",
@@ -160,7 +165,10 @@ export default function WalletChecker() {
                 });
 
                 return (
-                  <li key={tx.hash} className="bg-gray-100 rounded p-3 text-sm flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                  <li
+                    key={tx.hash}
+                    className="bg-gray-100 rounded p-3 text-sm flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2"
+                  >
                     <div>
                       <p><strong>To:</strong> {toAddress}</p>
                       <p><strong>Amount:</strong> {amount}</p>
@@ -206,7 +214,6 @@ export default function WalletChecker() {
     </div>
   );
 }
-
 
 
 
