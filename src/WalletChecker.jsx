@@ -27,13 +27,13 @@ export default function WalletChecker() {
       const balanceStr = coinStore.data.coin.value;
       return Number(balanceStr) / 1e8;
     } catch (err) {
-      console.error("Erro fetchAptBalance detalhado:", err);
+      console.error("Detailed fetchAptBalance error:", err);
       throw err;
     }
   }
 
-  function formatNumberBR(num) {
-    return num.toLocaleString("pt-BR", {
+  function formatNumberEN(num) {
+    return num.toLocaleString("en-US", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
@@ -44,7 +44,7 @@ export default function WalletChecker() {
     setBalance(null);
 
     if (!isValidAptosAddress(address)) {
-      setError("Endereço Aptos inválido!");
+      setError("Invalid Aptos address!");
       return;
     }
 
@@ -53,7 +53,7 @@ export default function WalletChecker() {
       const apt = await fetchAptBalance(address);
       setBalance(apt);
     } catch {
-      setError("Erro ao buscar saldo.");
+      setError("Error fetching balance.");
     } finally {
       setLoading(false);
     }
@@ -61,7 +61,7 @@ export default function WalletChecker() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4 text-black">
-      <div className="max-w-md w-full space-y-6">
+      <div className="max-w-md w-full space-y-6 text-center">
         <header className="flex items-center justify-center gap-3">
           <img src="/aptos-logo.png" alt="Aptos Logo" className="w-8 h-8" />
           <h1 className="text-3xl font-bold">AptosScanMe</h1>
@@ -69,7 +69,7 @@ export default function WalletChecker() {
 
         <input
           type="text"
-          placeholder="Cole seu endereço Aptos"
+          placeholder="Paste your Aptos address"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           className="w-full p-3 border border-gray-400 rounded text-black"
@@ -80,19 +80,19 @@ export default function WalletChecker() {
           disabled={loading}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded"
         >
-          {loading ? "Consultando..." : "Consultar saldo"}
+          {loading ? "Checking..." : "Check Balance"}
         </button>
 
-        {error && <p className="text-red-600 text-center">{error}</p>}
+        {error && <p className="text-red-600">{error}</p>}
 
         {balance !== null && (
-          <div className="text-center">
-            <h2 className="text-xl font-semibold mb-2">Saldo (APT):</h2>
-            <p className="text-2xl font-bold">{formatNumberBR(balance)}</p>
+          <div>
+            <h2 className="text-xl font-semibold mb-2">Balance (APT):</h2>
+            <p className="text-2xl font-bold">{formatNumberEN(balance)}</p>
           </div>
         )}
 
-        <footer className="mt-10 border-t pt-4 text-center text-gray-600 text-sm">
+        <footer className="mt-10 border-t pt-4 text-gray-600 text-sm">
           ©2025 AptosScanMe. Powered by{" "}
           <a
             href="https://github.com/andromedacripto"
