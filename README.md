@@ -21,7 +21,7 @@ AptosScanMe is a simple dApp built for the Aptos Vietnam Hackathon. It allows an
 
 - GitHub: [andromedacripto](https://github.com/andromedacripto)  
 - Email: andromedacripto17@gmail.com  
-- Aptos Wallet: 0x939b9b01124f09be2c8a5d92899d09375d4b87e492f4f6782a39f8f83a7a1f22
+- Aptos Wallet: 0x296da8e7b4fc86b0ffb59078ac132b93ac30cd2d8831d9211077317e9c299050
 
 
 ## License
