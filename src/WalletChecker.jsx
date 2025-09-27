@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { Aptos, Network } from "@aptos-labs/ts-sdk";
+import {
+  Aptos,
+  AptosConfig,
+  Network
+} from "@aptos-labs/ts-sdk";
 
 export default function WalletChecker() {
   const [address, setAddress] = useState("");
@@ -7,36 +11,24 @@ export default function WalletChecker() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const client = new Aptos({ network: Network.MAINNET });
+  // Config para mainnet
+  const client = new Aptos(
+    new AptosConfig({ network: Network.MAINNET })
+  );
 
   const isValidAptosAddress = (addr) => /^0x[a-fA-F0-9]{64}$/.test(addr);
 
   async function fetchAptBalance(addr) {
     try {
-      const resources = await client.getAccountResources({ accountAddress: addr });
-      console.log("Resources:", resources);
-
-      const coinStore = resources.find(
-        (r) => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>"
-      );
-
-      console.log("CoinStore:", coinStore);
-
-      if (!coinStore) return 0;
-
-      const balanceStr = coinStore.data.coin.value;
-      return Number(balanceStr) / 1e8;
+      // Pega saldo de APT direto da SDK
+      const balance = await client.getAccountAPTAmount({
+        accountAddress: addr,
+      });
+      return Number(balance) / 1e8; // converte de Octas para APT
     } catch (err) {
-      console.error("Detailed fetchAptBalance error:", err);
+      console.error("Erro detalhado:", err);
       throw err;
     }
-  }
-
-  function formatNumberEN(num) {
-    return num.toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
   }
 
   async function checkBalance() {
@@ -57,6 +49,13 @@ export default function WalletChecker() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function formatNumberEN(num) {
+    return num.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   }
 
   return (
